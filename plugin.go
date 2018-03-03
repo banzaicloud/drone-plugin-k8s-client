@@ -300,7 +300,7 @@ func (p *Plugin) WatchJob(clientSet *kubernetes.Clientset) (watch.Interface, err
 	// set up the proper list options, use labels
 	options := metaV1.ListOptions{
 		Watch:         true,
-		LabelSelector: strings.Join([]string{label, labels[label]}, "="),
+		LabelSelector: strings.Join([]string{label, p.LabelSelector[label]}, "="),
 	}
 
 	jobWatcher, err := clientSet.BatchV1().Jobs(p.Namespace).Watch(options)
@@ -376,7 +376,7 @@ func (p *Plugin) CreateOrGetPVC(clientSet *kubernetes.Clientset) (*coreV1.Persis
 
 	claim, err := clientSet.CoreV1().PersistentVolumeClaims(p.Namespace).Get(p.WorkspacePVC, metaV1.GetOptions{})
 	if err != nil {
-		logrus.Warnf("error while getting the PVC: [%s], error %s;", p.WorkspacePVC, err)
+		logrus.Warnf("error while getting the PVC: [ %s ], error %s;", p.WorkspacePVC, err)
 	} else {
 		logrus.Debugf("using existing PVC: [ %s ]", claim.String())
 		return claim, nil
