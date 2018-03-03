@@ -24,10 +24,6 @@ const (
 	appVersion = "0.0.1"
 )
 
-var (
-	labels = map[string]string{label: "labelValue"}
-)
-
 func main() {
 
 	app := cli.NewApp()
@@ -108,7 +104,7 @@ func run(c *cli.Context) error {
 		WorkspacePVC:     workspacePVC(),
 		JobName:          jobName(),
 		OriginalCommands: originalCommands(),
-		LabelSelector:    labels,
+		LabelSelector:    labelSelector(),
 		Env:              pluginEnv(),
 		Wg:               &wg,
 	}
@@ -197,4 +193,10 @@ func pluginEnv() map[string]string {
 	}
 	logrus.Debugf("parsed env map: %s", pluginEnv)
 	return pluginEnv
+}
+
+func labelSelector() map[string]string {
+	return map[string]string{
+		label: strings.Join([]string{os.Getenv("DRONE_BUILD_NUMBER"), "label"}, "-"),
+	}
 }
