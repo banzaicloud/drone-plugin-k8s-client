@@ -57,11 +57,15 @@ func main() {
 			Usage:  "repository full name",
 			EnvVar: "PLUGIN_JOB_WORKSPACE",
 		},
-
 		cli.StringFlag{
 			Name:   "plugin.job.label.selector",
 			Usage:  "repository full name",
 			EnvVar: "PLUGIN_JOB_LABEL_SELECTOR",
+		},
+		cli.StringFlag{
+			Name:   "plugin.log.level",
+			Usage:  "the log level for the plugin",
+			EnvVar: "PLUGIN_LOG_LEVEL",
 		},
 	}
 
@@ -74,6 +78,7 @@ func main() {
 }
 
 func run(c *cli.Context) error {
+	processLogLevel(c)
 
 	logrus.Debugf("plugin environment: %s", os.Environ())
 	flag.Parse()
@@ -181,7 +186,7 @@ func originalCommands() []string {
 func kubeConfigPath() string {
 	//export KUBECONFIG="$DRONE_WORKSPACE/.kube/config"
 	kubeConfigPath := filepath.Join(os.Getenv("DRONE_WORKSPACE"), ".kube", "config")
-	logrus.Infof("kube config path: [ %s ]", kubeConfigPath)
+	logrus.Debugf("kube config path: [ %s ]", kubeConfigPath)
 	return kubeConfigPath
 }
 
@@ -198,5 +203,22 @@ func pluginEnv() map[string]string {
 func labelSelector() map[string]string {
 	return map[string]string{
 		label: strings.Join([]string{os.Getenv("DRONE_BUILD_NUMBER"), "label"}, "-"),
+	}
+}
+
+func processLogLevel(c *cli.Context) {
+	switch strings.ToUpper(c.String("plugin.log.level")) {
+	case "INFO":
+		logrus.SetLevel(logrus.InfoLevel)
+	case "DEBUG":
+		logrus.SetLevel(logrus.DebugLevel)
+	case "WARN":
+		logrus.SetLevel(logrus.WarnLevel)
+	case "ERROR":
+		logrus.SetLevel(logrus.ErrorLevel)
+	case "PANIC":
+		logrus.SetLevel(logrus.PanicLevel)
+	default:
+		logrus.SetLevel(logrus.InfoLevel)
 	}
 }
