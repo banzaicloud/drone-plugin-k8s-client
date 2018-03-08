@@ -116,7 +116,7 @@ func (p *Plugin) handleJobEvent(event watch.Event, watcher watch.Interface, clie
 	case watch.Error:
 		logrus.Debugf("job in error, status: [ %s ]", event.Object.GetObjectKind())
 	default:
-		logrus.Warnf("received (unhandled) event of type: [ %s ]", payloadType)
+		logrus.Debugf("received (unhandled) event of type: [ %s ]", payloadType)
 	}
 
 	return nil
@@ -149,7 +149,7 @@ func (p *Plugin) handlePodEvent(event watch.Event, watcher watch.Interface, clie
 		watcher.Stop()
 		watchingStatusOff(PodWatcherStatusKey)
 	default:
-		logrus.Warn("received (unhandled) event of type: [ %s ]", event.Type)
+		logrus.Debugf("received (unhandled) event of type: [ %s ]", event.Type)
 	}
 
 }
@@ -174,7 +174,7 @@ func (p *Plugin) CreateJob(clientSet *kubernetes.Clientset) error {
 		return err
 	}
 
-	logrus.Infof("created job: [ %s ]", job.GetName())
+	logrus.Debugf("created job: [ %s ]", job.GetName())
 	return nil
 }
 
@@ -187,7 +187,7 @@ func (p *Plugin) DeleteJob(clientSet *kubernetes.Clientset) error {
 	if err != nil {
 		return err
 	}
-	logrus.Infof("deleted job: [ %s ]", p.JobName)
+	logrus.Debugf("deleted job: [ %s ]", p.JobName)
 	return nil
 
 }
@@ -290,6 +290,7 @@ func (p *Plugin) WatchLogs(podName string, clientSet *kubernetes.Clientset) {
 
 	logrus.Debugf("Bytes written: [ %s ]. error: [ %s ]. ", written, err)
 	watchingStatusOff(LogWatcherStatusKey)
+	logrus.Infof("***** end of the logs for pod [ %s ] *****", podName)
 	// regardless the result of copy the goroutine ends here, need to signal it
 	p.Wg.Done()
 
@@ -310,7 +311,7 @@ func (p *Plugin) WatchJob(clientSet *kubernetes.Clientset) (watch.Interface, err
 		return nil, err
 	}
 	watchingStatusOn(JobWatcherStatusKey)
-	logrus.Infof("job watcher started")
+	logrus.Debugf("job watcher started")
 	return jobWatcher, nil
 
 }
@@ -344,7 +345,7 @@ func (p *Plugin) JobEvents(watcher watch.Interface, clientSet *kubernetes.Client
 			return err
 		}
 	}
-	logrus.Infof("job succeeded")
+	logrus.Debugf("job [%s] succeeded", p.JobName)
 	// wait till the log reader goroutine is done
 	return nil
 }
