@@ -377,7 +377,7 @@ func (p *Plugin) CreateOrGetPVC(clientSet *kubernetes.Clientset) (*coreV1.Persis
 
 	claim, err := clientSet.CoreV1().PersistentVolumeClaims(p.Namespace).Get(p.WorkspacePVC, metaV1.GetOptions{})
 	if err != nil {
-		logrus.Warnf("error while getting the PVC: [ %s ], error %s;", p.WorkspacePVC, err)
+		logrus.Debugf("could not find the PVC: [ %s ], msg: [ %s ];", p.WorkspacePVC, err.Error())
 	} else {
 		logrus.Debugf("using existing PVC: [ %s ]", claim.String())
 		return claim, nil
@@ -424,5 +424,5 @@ func (p *Plugin) DeletePVC(clientSet *kubernetes.Clientset) error {
 
 func (p *Plugin) Cleanup(clientSet *kubernetes.Clientset) {
 	p.DeleteJob(clientSet)
-	//p.DeletePVC(clientSet)
+	p.DeletePVC(clientSet)
 }
