@@ -1,4 +1,4 @@
-EXECUTABLE ?= k8s-proxy
+EXECUTABLE ?= k8s-client
 IMAGE ?= banzaicloud/plugin-$(EXECUTABLE)
 TAG ?= dev-$(shell git log -1 --pretty=format:"%h")
 
