@@ -424,5 +424,5 @@ func (p *Plugin) DeletePVC(clientSet *kubernetes.Clientset) error {
 
 func (p *Plugin) Cleanup(clientSet *kubernetes.Clientset) {
 	p.DeleteJob(clientSet)
-	p.DeletePVC(clientSet)
+	//p.DeletePVC(clientSet)
 }
